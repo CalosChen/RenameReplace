@@ -36,7 +36,9 @@ namespace rename
                     if (fileInfo.Name.Contains(oldString))
                     {
                         var newName = fileInfo.Name.Replace(oldString, newString);
-                        fileInfo.MoveTo(fileInfo.Directory.FullName + "\\" + newName);
+                        if (!string.IsNullOrEmpty(newName))
+                            fileInfo.MoveTo(fileInfo.Directory.FullName + "\\" + newName);
+                        else Console.WriteLine("Empty name in file path after replacement!");
                     }
                 }
                 var dirs = Directory.GetDirectories(input);
@@ -49,7 +51,9 @@ namespace rename
                         if (dirInfo.Name.Contains(oldString))
                         {
                             var name = dirInfo.Name.Replace(oldString, newString);
-                            dirInfo.MoveTo(dirInfo.Parent.FullName + "\\" + name);
+                            if (!string.IsNullOrEmpty(name))
+                                dirInfo.MoveTo(dirInfo.Parent.FullName + "\\" + name);
+                            else Console.WriteLine("Empty name in directory path after replacement!");
                         }
 
                     }
