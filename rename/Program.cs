@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace rename
@@ -50,6 +51,8 @@ namespace rename
                         {
                             Rename(dir, oldString, newString);
                             DirectoryInfo dirInfo = new DirectoryInfo(dir);
+                            var filter = new List<string>() { ".git", ".vs" };
+                            if (filter.Contains(dirInfo.Name)) return;
                             if (dirInfo.Name.Contains(oldString))
                             {
                                 var name = dirInfo.Name.Replace(oldString, newString);
