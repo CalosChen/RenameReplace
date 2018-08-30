@@ -28,6 +28,10 @@ namespace rename
             {
                 try
                 {
+                    DirectoryInfo dirInfo = new DirectoryInfo(input);
+                    var filter = new List<string>() { ".git", ".vs" };
+                    if (filter.Contains(dirInfo.Name)) return;
+
                     var files = Directory.GetFiles(input);
                     foreach (var file in files)
                     {
@@ -44,23 +48,22 @@ namespace rename
                             else Console.WriteLine("Empty name in file path after replacement!");
                         }
                     }
+
+
+                    if (dirInfo.Name.Contains(oldString))
+                    {
+                        var name = dirInfo.Name.Replace(oldString, newString);
+                        if (!string.IsNullOrEmpty(name))
+                            dirInfo.MoveTo(dirInfo.Parent.FullName + "\\" + name);
+                        else Console.WriteLine("Empty name in directory path after replacement!");
+                    }
+
                     var dirs = Directory.GetDirectories(input);
                     if (dirs.Length > 0)
                     {
                         foreach (var dir in dirs)
                         {
                             Rename(dir, oldString, newString);
-                            DirectoryInfo dirInfo = new DirectoryInfo(dir);
-                            var filter = new List<string>() { ".git", ".vs" };
-                            if (filter.Contains(dirInfo.Name)) return;
-                            if (dirInfo.Name.Contains(oldString))
-                            {
-                                var name = dirInfo.Name.Replace(oldString, newString);
-                                if (!string.IsNullOrEmpty(name))
-                                    dirInfo.MoveTo(dirInfo.Parent.FullName + "\\" + name);
-                                else Console.WriteLine("Empty name in directory path after replacement!");
-                            }
-
                         }
                     }
                 }
