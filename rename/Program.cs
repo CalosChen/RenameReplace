@@ -35,7 +35,20 @@ namespace rename
                 var filter = new List<string>() { ".git", ".vs" };
                 if (filter.Contains(dirInfo.Name)) return;
 
-                var files = Directory.GetFiles(inputDir);
+                if (dirInfo.Name.Contains(oldString))
+                {
+                    var name = dirInfo.Name.Replace(oldString, newString);
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        var newDirName = dirInfo.Parent.FullName + "\\" + name;
+                        dirInfo.MoveTo(newDirName);
+                        dirInfo = new DirectoryInfo(newDirName);
+                    }
+                    else Console.WriteLine("Empty name in directory path after replacement!");
+                }
+
+
+                var files = Directory.GetFiles(dirInfo.FullName);
                 foreach (var file in files)
                 {
                     FileInfo fileInfo = new FileInfo(file);
@@ -53,15 +66,7 @@ namespace rename
                 }
 
 
-                if (dirInfo.Name.Contains(oldString))
-                {
-                    var name = dirInfo.Name.Replace(oldString, newString);
-                    if (!string.IsNullOrEmpty(name))
-                        dirInfo.MoveTo(dirInfo.Parent.FullName + "\\" + name);
-                    else Console.WriteLine("Empty name in directory path after replacement!");
-                }
-
-                var dirs = Directory.GetDirectories(inputDir);
+                var dirs = Directory.GetDirectories(dirInfo.FullName);
                 if (dirs.Length > 0)
                 {
                     foreach (var dir in dirs)
