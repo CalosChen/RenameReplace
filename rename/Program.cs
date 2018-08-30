@@ -42,7 +42,6 @@ namespace rename
                     {
                         var newDirName = dirInfo.Parent.FullName + "\\" + name;
                         dirInfo.MoveTo(newDirName);
-                        dirInfo = new DirectoryInfo(newDirName);
                     }
                     else Console.WriteLine("Empty name in directory path after replacement!");
                 }
