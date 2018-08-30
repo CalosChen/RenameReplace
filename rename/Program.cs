@@ -10,7 +10,7 @@ namespace rename
         {
 
             Console.WriteLine("Hello World!");
-
+            var osHelper = new OSHelper();
             var quit = false;
             while (!quit)
             {
@@ -20,55 +20,57 @@ namespace rename
                 var oldString = Console.ReadLine();
                 Console.WriteLine("new string:");
                 var newString = Console.ReadLine();
-                Rename(input, oldString, newString);
+                osHelper.Rename(input, oldString, newString);
             }
+        }
+    }
 
-
-            void Rename(string input, string oldString, string newString)
+    public class OSHelper
+    {
+        public void Rename(string inputDir, string oldString, string newString)
+        {
+            try
             {
-                try
+                DirectoryInfo dirInfo = new DirectoryInfo(inputDir);
+                var filter = new List<string>() { ".git", ".vs" };
+                if (filter.Contains(dirInfo.Name)) return;
+
+                var files = Directory.GetFiles(inputDir);
+                foreach (var file in files)
                 {
-                    DirectoryInfo dirInfo = new DirectoryInfo(input);
-                    var filter = new List<string>() { ".git", ".vs" };
-                    if (filter.Contains(dirInfo.Name)) return;
+                    FileInfo fileInfo = new FileInfo(file);
+                    var content = File.ReadAllText(file);
+                    if (content.Contains(oldString))
+                        File.WriteAllText(file, content.Replace(oldString, newString));
 
-                    var files = Directory.GetFiles(input);
-                    foreach (var file in files)
+                    if (fileInfo.Name.Contains(oldString))
                     {
-                        FileInfo fileInfo = new FileInfo(file);
-                        var content = File.ReadAllText(file);
-                        if (content.Contains(oldString))
-                            File.WriteAllText(file, content.Replace(oldString, newString));
-
-                        if (fileInfo.Name.Contains(oldString))
-                        {
-                            var newName = fileInfo.Name.Replace(oldString, newString);
-                            if (!string.IsNullOrEmpty(newName))
-                                fileInfo.MoveTo(fileInfo.Directory.FullName + "\\" + newName);
-                            else Console.WriteLine("Empty name in file path after replacement!");
-                        }
-                    }
-
-
-                    if (dirInfo.Name.Contains(oldString))
-                    {
-                        var name = dirInfo.Name.Replace(oldString, newString);
-                        if (!string.IsNullOrEmpty(name))
-                            dirInfo.MoveTo(dirInfo.Parent.FullName + "\\" + name);
-                        else Console.WriteLine("Empty name in directory path after replacement!");
-                    }
-
-                    var dirs = Directory.GetDirectories(input);
-                    if (dirs.Length > 0)
-                    {
-                        foreach (var dir in dirs)
-                        {
-                            Rename(dir, oldString, newString);
-                        }
+                        var newName = fileInfo.Name.Replace(oldString, newString);
+                        if (!string.IsNullOrEmpty(newName))
+                            fileInfo.MoveTo(fileInfo.Directory.FullName + "\\" + newName);
+                        else Console.WriteLine("Empty name in file path after replacement!");
                     }
                 }
-                catch (Exception ex) { Console.WriteLine(ex.Message); }
+
+
+                if (dirInfo.Name.Contains(oldString))
+                {
+                    var name = dirInfo.Name.Replace(oldString, newString);
+                    if (!string.IsNullOrEmpty(name))
+                        dirInfo.MoveTo(dirInfo.Parent.FullName + "\\" + name);
+                    else Console.WriteLine("Empty name in directory path after replacement!");
+                }
+
+                var dirs = Directory.GetDirectories(inputDir);
+                if (dirs.Length > 0)
+                {
+                    foreach (var dir in dirs)
+                    {
+                        Rename(dir, oldString, newString);
+                    }
+                }
             }
+            catch (Exception ex) { Console.WriteLine(ex.Message); }
         }
     }
 }
